@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>QuickLook.Plugin.MarkdownStyle</AssemblyName>
+    <RootNamespace>QuickLook.Plugin.MarkdownStyle</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
+    <Platforms>AnyCPU;x64</Platforms>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Same reference as QuickLook.Plugin.HelloWorld: QuickLook.Common checked out beside this project. -->
+    <ProjectReference Include="..\QuickLook.Common\QuickLook.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\default-markdown.css">
+      <LogicalName>default-markdown.css</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
