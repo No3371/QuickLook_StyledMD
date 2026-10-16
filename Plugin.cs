@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace QuickLook.Plugin.MarkdownStyle
+namespace QuickLook.Plugin.StyledMD
 {
     /// <summary>
     /// Handles no file. Patches the built-in MarkdownViewer's in-memory resources so its
@@ -34,7 +34,7 @@ namespace QuickLook.Plugin.MarkdownStyle
             "pooi.moe", "QuickLook");
 
         private static string CssPath => Path.Combine(DataDir, "user-markdown.css");
-        private static string LogPath => Path.Combine(DataDir, "markdownstyle.log");
+        private static string LogPath => Path.Combine(DataDir, "styledmd.log");
 
         private static int _logLines;
 

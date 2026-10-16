@@ -1,6 +1,6 @@
 # StyledMD
 
-A QuickLook plugin (`QuickLook.Plugin.MarkdownStyle`).
+A QuickLook plugin (`QuickLook.Plugin.StyledMD`).
 
 A small plugin that gives QuickLook's built-in Markdown preview a calmer, more readable style:
 a soft sage page, soft black text, a wide reading column, and a steep step between small body text
@@ -23,7 +23,12 @@ This plugin only adds a style sheet to it.
 
 ## Names
 
-The repository is called StyledMD. The plugin keeps the file name `QuickLook.Plugin.MarkdownStyle.dll`, because QuickLook only loads files named `QuickLook.Plugin.*.dll`.
+The repository is StyledMD and the plugin is `QuickLook.Plugin.StyledMD`. QuickLook only loads files named `QuickLook.Plugin.*.dll`,
+so the plugin name has to start with `QuickLook.Plugin.`.
+
+**Upgrading from the earlier name `QuickLook.Plugin.MarkdownStyle`:** quit QuickLook and delete the folder
+`%APPDATA%\pooi.moe\QuickLook\QuickLook.Plugin\QuickLook.Plugin.MarkdownStyle\` before you install this one. Two copies would both patch the viewer.
+Your `user-markdown.css` is kept. You can delete the old `markdownstyle.log`.
 
 ## Requirements
 
@@ -38,11 +43,11 @@ Checked in the source of QuickLook 4.5.0 and master, and seen working on a real 
 
 ## Install
 
-1. Get `QuickLook.Plugin.MarkdownStyle.qlplugin` from the latest build or release.
+1. Get `QuickLook.Plugin.StyledMD.qlplugin` from the latest build or release.
    (Builds: the **Actions** tab, then the newest green run, then **Artifacts**.)
 2. A `.qlplugin` file is a zip. Unzip it into
-   `%APPDATA%\pooi.moe\QuickLook\QuickLook.Plugin\QuickLook.Plugin.MarkdownStyle\`
-   so that `QuickLook.Plugin.MarkdownStyle.dll` sits directly in that folder.
+   `%APPDATA%\pooi.moe\QuickLook\QuickLook.Plugin\QuickLook.Plugin.StyledMD\`
+   so that `QuickLook.Plugin.StyledMD.dll` sits directly in that folder.
 3. Restart QuickLook (quit it from the tray icon, then start it again).
 4. Select a `.md` file and press Space.
 
@@ -75,7 +80,7 @@ A file from an older version that holds a full copy of the style is renamed to `
 
 ## If nothing changes
 
-The plugin writes a log: `%APPDATA%\pooi.moe\QuickLook\markdownstyle.log`.
+The plugin writes a log: `%APPDATA%\pooi.moe\QuickLook\styledmd.log`.
 
 | You see | Meaning |
 |---|---|
@@ -99,7 +104,7 @@ All in `%APPDATA%\pooi.moe\QuickLook\`:
 
 - `user-markdown.css`: your overrides.
 - `user-markdown.css.old`: only after migrating from an older version.
-- `markdownstyle.log`: the log above.
+- `styledmd.log`: the log above.
 
 ## How it works
 
@@ -128,7 +133,7 @@ Needs Windows with the .NET SDK or Visual Studio 2022. The project targets `net4
 git clone --recurse-submodules <this repository>
 cd StyledMD
 dotnet build -c Release
-powershell Scripts\pack-zip.ps1     # creates QuickLook.Plugin.MarkdownStyle.qlplugin
+powershell Scripts\pack-zip.ps1     # creates QuickLook.Plugin.StyledMD.qlplugin
 ```
 
 `QuickLook.Common` is a git submodule. `Directory.Build.props` and `Scripts\update-version.ps1` exist only because
@@ -142,7 +147,7 @@ Push a tag that starts with `v` (for example `v0.2.0`), or run the workflow by h
 Please report problems with this plugin here, not to QuickLook. Include:
 
 - your QuickLook version,
-- the last lines of `markdownstyle.log` (remove file names you do not want to share),
+- the last lines of `styledmd.log` (remove file names you do not want to share),
 - a screenshot, if the problem is how the page looks.
 
 ## Credits

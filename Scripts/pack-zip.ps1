@@ -1,7 +1,7 @@
 # Run after a Release build: dotnet build -c Release
 $root = Split-Path $PSScriptRoot -Parent
-$out = Join-Path $root "QuickLook.Plugin.MarkdownStyle.qlplugin"
-$zip = Join-Path $root "QuickLook.Plugin.MarkdownStyle.zip"
+$out = Join-Path $root "QuickLook.Plugin.StyledMD.qlplugin"
+$zip = Join-Path $root "QuickLook.Plugin.StyledMD.zip"
 
 Remove-Item $out, $zip -ErrorAction SilentlyContinue
 

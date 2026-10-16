@@ -37,7 +37,7 @@ jobs:
           $xml.Save("$PWD\QuickLook.Plugin.Metadata.config")
 
       - name: Build
-        run: dotnet build QuickLook.Plugin.MarkdownStyle.csproj -c Release
+        run: dotnet build QuickLook.Plugin.StyledMD.csproj -c Release
 
       - name: Pack .qlplugin
         shell: pwsh
@@ -45,8 +45,8 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: QuickLook.Plugin.MarkdownStyle
-          path: QuickLook.Plugin.MarkdownStyle.qlplugin
+          name: QuickLook.Plugin.StyledMD
+          path: QuickLook.Plugin.StyledMD.qlplugin
           if-no-files-found: error
 
       - name: Create release
@@ -55,4 +55,4 @@ jobs:
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           generate_release_notes: true
-          files: QuickLook.Plugin.MarkdownStyle.qlplugin
+          files: QuickLook.Plugin.StyledMD.qlplugin

@@ -2,8 +2,8 @@
     <PropertyGroup>
         <OutputType>Library</OutputType>
         <TargetFramework>net462</TargetFramework>
-        <RootNamespace>QuickLook.Plugin.MarkdownStyle</RootNamespace>
-        <AssemblyName>QuickLook.Plugin.MarkdownStyle</AssemblyName>
+        <RootNamespace>QuickLook.Plugin.StyledMD</RootNamespace>
+        <AssemblyName>QuickLook.Plugin.StyledMD</AssemblyName>
         <Platforms>AnyCPU;x64</Platforms>
         <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
