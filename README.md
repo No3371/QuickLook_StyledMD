@@ -5,6 +5,7 @@ A QuickLook plugin (`QuickLook.Plugin.StyledMD`) that override how QuickLook ren
 The opinionated style is inspired by amazing design of the website of Typesafe.ai. It's far from there but the plugin tries to mimic the vibe of strong contrast of font weight and size, higher base font weights and and soft color palette.
 
 ## Preview
+<img width="499" height="682" alt="image" src="https://github.com/user-attachments/assets/c65ce690-8792-4895-9aa9-22f15f0f6f0f" />
 
 ## Requirements
 
