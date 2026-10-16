@@ -1,46 +1,159 @@
 # QuickLook.Plugin.MarkdownStyle
 
-Restyles QuickLook's built-in Markdown preview with your own CSS. It handles no file itself.
+A small plugin that gives QuickLook's built-in Markdown preview a calmer, more readable style:
+a soft sage page, soft black text, a wide reading column, and a steep step between small body text
+and large headings.
 
-## How it works
-On the first `CanHandle` call, the plugin finds the loaded `QuickLook.Plugin.MarkdownViewer`
-assembly and runs the static constructor of `MarkdownPanel`. It reflects the static
-`_resources` dictionary and does two things:
+It does not open or render any file. QuickLook's own Markdown viewer still does all of that.
+This plugin only adds a style sheet to it.
 
-1. Inserts `<link rel="stylesheet" href="user.css" />` before `</head>` in `/md2html.html`.
-2. Stores the built-in default style (embedded in the DLL), followed by `%APPDATA%\pooi.moe\QuickLook\user-markdown.css`, under `/user.css`.
+> **Status:** not an official QuickLook plugin, and not affiliated with QuickLook or Typesafe.
+> See [Credits](#credits) and [Limits](#limits).
 
-The built-in viewer already serves any key in `_resources`. The plugin re-reads the CSS
-file when its timestamp changes. Any failure is caught and leaves the built-in viewer unchanged.
+## What you get
 
-The default style updates with the plugin. `user-markdown.css` holds only your overrides and loads last.
-If the file is missing, the plugin writes an empty template. A file from an older version that holds a full copy of the default is renamed to `user-markdown.css.old`.
-
-## Build
-Same layout as `QuickLook.Plugin.HelloWorld`. Needs Windows with the .NET SDK or Visual Studio 2022.
-
-```powershell
-git submodule update --init            # fetches QuickLook.Common
-dotnet build -c Release                # output: bin\Release\
-powershell Scripts\pack-zip.ps1        # output: QuickLook.Plugin.MarkdownStyle.qlplugin
-```
-
-A `.qlplugin` file is a zip of `bin\Release\` (without `*.pdb` and `*.xml`) with the extension renamed.
-Install (not verified): open the `.qlplugin` file with QuickLook, or unzip it into a `QuickLook.Plugin\QuickLook.Plugin.MarkdownStyle` folder.
-
-## Not tested
-Written on Linux with no .NET toolchain: it was never compiled or run. Test on Windows against your QuickLook version.
-It relies on private names: `MarkdownPanel._resources`, the key `/md2html.html`, and a literal `</head>`.
-
-## Debugging
-The plugin writes `%APPDATA%\pooi.moe\QuickLook\markdownstyle.log`. If the file does not exist after you preview
-a file, QuickLook did not load the plugin. If it ends with `GAVE UP: ...`, the line says which assumption failed.
+- **Light only.** The page stays light when Windows is in dark mode.
+- **Headings.** h1 and h2 use Bebas Neue (capitals only). h3 is Roboto Bold. Body text is 17px, weight 400.
+- **Body text.** Roboto first, then Noto Sans. Characters those fonts lack (for example Chinese) use the next installed font.
+- **Code.** Weight 400 with a thin stroke, so it does not look faint.
+- **Tables, quotes, links.** Rounded table border, an accent bar on quotes, a pink link underline.
+- **Your own CSS.** One file of overrides that loads after the built-in style.
 
 ## Requirements
-Needs a QuickLook whose Markdown viewer has `MarkdownPanel._resources`. Checked in source: QuickLook 4.5.0 and master.
-QuickLook 3.6.4 does not have it (it loads the template from a .NET resource and calls `WebpagePanel.LoadHtml`),
-so the log shows `GAVE UP: type or field not found`.
 
-## Fonts and theme
-- h1 and h2 use Bebas Neue, embedded in the DLL as a Latin-subset WOFF2 (SIL OFL 1.1, license in `Resources/fonts/`). An installed Bebas Neue is used first.
-- The page is light only. The plugin rewrites `prefers-color-scheme` queries in the viewer's CSS and template in memory, so a dark system theme has no effect.
+| Item | Needs |
+|---|---|
+| OS | Windows |
+| QuickLook | A version whose Markdown viewer has `MarkdownPanel._resources` |
+
+Checked in the source of QuickLook 4.5.0 and master, and seen working on a real Windows install.
+**QuickLook 3.6.4 does not work.** Its Markdown viewer has no `MarkdownPanel`, and the log shows
+`GAVE UP: type or field not found`. Upgrade QuickLook first.
+
+## Install
+
+1. Get `QuickLook.Plugin.MarkdownStyle.qlplugin` from the latest build or release.
+   (Builds: the **Actions** tab, then the newest green run, then **Artifacts**.)
+2. A `.qlplugin` file is a zip. Unzip it into
+   `%APPDATA%\pooi.moe\QuickLook\QuickLook.Plugin\QuickLook.Plugin.MarkdownStyle\`
+   so that `QuickLook.Plugin.MarkdownStyle.dll` sits directly in that folder.
+3. Restart QuickLook (quit it from the tray icon, then start it again).
+4. Select a `.md` file and press Space.
+
+To remove it, quit QuickLook and delete that folder. Optionally delete the files listed in
+[Files the plugin writes](#files-the-plugin-writes).
+
+## Change the style
+
+Open `%APPDATA%\pooi.moe\QuickLook\user-markdown.css`. The plugin creates it on first run.
+Put only the rules you want to change in it. It loads after the built-in style, so your rules win,
+and it is re-read on the next preview. If a change does not show, restart QuickLook.
+
+```css
+/* wider column */
+#preview { max-width: 900px; }
+
+/* your own colors */
+:root {
+  --ts-bg: #f4f1ea;
+  --ts-accent: #2a7de1;
+}
+```
+
+Useful variables: `--ts-bg`, `--ts-text`, `--ts-text-soft`, `--ts-code-bg`, `--ts-rule`, `--ts-th-bg`,
+`--ts-accent`, `--ts-sans`, `--ts-mono`, `--ts-display`.
+Useful selectors: `body.markdown-body`, `#preview` (the rendered document), `#toc` (the contents sidebar).
+
+The built-in style is replaced on every plugin update. Keep your changes in `user-markdown.css`.
+A file from an older version that holds a full copy of the style is renamed to `user-markdown.css.old`.
+
+## If nothing changes
+
+The plugin writes a log: `%APPDATA%\pooi.moe\QuickLook\markdownstyle.log`.
+
+| You see | Meaning |
+|---|---|
+| No log file | QuickLook did not load the plugin. Check the install folder in step 2. |
+| `viewer assembly not loaded (will retry)` | The Markdown viewer was not loaded yet. Preview a `.md` file again. |
+| `GAVE UP: type or field not found ...` | Your QuickLook is too old or too new for this plugin. See [Requirements](#requirements). |
+| `GAVE UP: /md2html.html not in _resources ...` | The viewer's template changed. See [Limits](#limits). |
+| `template patched`, `forced light theme in N resources`, `css built: N bytes` | The patch worked. If the page still looks wrong, check your `user-markdown.css`. |
+
+If the plugin gives up, QuickLook shows its normal Markdown preview. Nothing else breaks.
+
+## Privacy and safety
+
+- The plugin makes no network requests.
+- It changes only QuickLook's in-memory copy of the viewer's template and style sheets. It does not edit any QuickLook file.
+- **The log records file names.** For the first 50 previews after QuickLook starts, it writes the name (not the path or the contents) of each previewed file. Delete the log whenever you like. The plugin also deletes it at startup when it is over 100 KB.
+
+## Files the plugin writes
+
+All in `%APPDATA%\pooi.moe\QuickLook\`:
+
+- `user-markdown.css`: your overrides.
+- `user-markdown.css.old`: only after migrating from an older version.
+- `markdownstyle.log`: the log above.
+
+## How it works
+
+1. QuickLook loads the plugin. On the first `CanHandle` call, the plugin finds the loaded
+   `QuickLook.Plugin.MarkdownViewer` assembly and reads the private static `MarkdownPanel._resources` dictionary.
+   The plugin has priority 1 and always answers "cannot handle", so the built-in viewer opens every file.
+2. It inserts `<link rel="stylesheet" href="user.css" />` into `/md2html.html`, after the `github-markdown.css` link
+   (that link is inside `<body>`, so a link in `<head>` would load too early).
+3. It rewrites the `prefers-color-scheme` queries in the viewer's template and style sheets so dark mode never applies.
+4. It stores `/user.css` in the same dictionary: the embedded Bebas Neue font, the built-in style, then your file.
+   The viewer already serves every key of that dictionary to its web view.
+
+## Limits
+
+- **It relies on private names:** `MarkdownPanel._resources`, the key `/md2html.html`, and the order of links in the template.
+  A QuickLook update can change them and the plugin then gives up (see the log). Test after each QuickLook update.
+- Mermaid previews use the same template, so they get the style. AsciiDoc, reStructuredText and Jupyter previews use other templates and are not styled.
+- Bebas Neue is capitals only and covers Latin characters. Other scripts fall back to your other fonts.
+- Roboto and Noto Sans are not bundled. Without them on your PC, headings and body text fall back to Segoe UI or another system font.
+
+## Build
+
+Needs Windows with the .NET SDK or Visual Studio 2022. The project targets `net462` with WPF, so it does not build on Linux or macOS.
+
+```powershell
+git clone --recurse-submodules <this repository>
+cd QuickLook.Plugin.MarkdownStyle
+dotnet build -c Release
+powershell Scripts\pack-zip.ps1     # creates QuickLook.Plugin.MarkdownStyle.qlplugin
+```
+
+`QuickLook.Common` is a git submodule. `Directory.Build.props` and `Scripts\update-version.ps1` exist only because
+`QuickLook.Common` runs a pre-build script that expects a solution folder.
+
+The GitHub Actions workflow `build-markdown-style.yml` does the same on a Windows runner and uploads the `.qlplugin` as an artifact.
+Push a tag that starts with `v` (for example `v0.2.0`), or run the workflow by hand with a tag, to also create a release.
+
+## Reporting problems
+
+Please report problems with this plugin here, not to QuickLook. Include:
+
+- your QuickLook version,
+- the last lines of `markdownstyle.log` (remove file names you do not want to share),
+- a screenshot, if the problem is how the page looks.
+
+## Credits
+
+Thank you to:
+
+- **QuickLook** and its contributors (QL-Win), for the viewer, the plugin interface and the `QuickLook.Plugin.HelloWorld` starting point this project follows. QuickLook and `QuickLook.Common` are GPL-3.0.
+- **Typesafe** (typesafe.ai), whose blog gave the look: the palette, the table and inline-code values, and the idea of a steep size and weight scale.
+  This project is not affiliated with or endorsed by Typesafe. It copies no stylesheet, image or font from them.
+  Their font, Die Grotesk C, is commercial and is never bundled. It is used only if you have it installed.
+- **Bebas Neue** by the Bebas Neue Project Authors (Dharma Type), embedded under the SIL Open Font License 1.1.
+  The license text is in `Resources/fonts/BebasNeue-OFL-LICENSE.txt`.
+- **Roboto** and **Noto Sans**, named in the font list and used only if installed.
+- **GitHub's Markdown CSS**, which QuickLook's viewer uses as its base style. This plugin only adds rules on top of it.
+- Built with the help of **Claude Code**.
+
+## License
+
+No license file has been added yet. Add one before you share builds. `QuickLook.Common` is GPL-3.0, and this plugin links to it,
+so GPL-3.0 is the safe choice unless you get legal advice otherwise.
