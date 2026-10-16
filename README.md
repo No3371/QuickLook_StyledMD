@@ -28,7 +28,7 @@ so the plugin name has to start with `QuickLook.Plugin.`.
 
 **Upgrading from the earlier name `QuickLook.Plugin.MarkdownStyle`:** quit QuickLook and delete the folder
 `%APPDATA%\pooi.moe\QuickLook\QuickLook.Plugin\QuickLook.Plugin.MarkdownStyle\` before you install this one. Two copies would both patch the viewer.
-Your `user-markdown.css` is kept. You can delete the old `markdownstyle.log`.
+Your `user-markdown.css` is kept. You can delete the old `markdownstyle.log`, which the earlier name wrote.
 
 ## Requirements
 
@@ -38,8 +38,7 @@ Your `user-markdown.css` is kept. You can delete the old `markdownstyle.log`.
 | QuickLook | A version whose Markdown viewer has `MarkdownPanel._resources` |
 
 Checked in the source of QuickLook 4.5.0 and master, and seen working on a real Windows install.
-**QuickLook 3.6.4 does not work.** Its Markdown viewer has no `MarkdownPanel`, and the log shows
-`GAVE UP: type or field not found`. Upgrade QuickLook first.
+**QuickLook 3.6.4 does not work.** Its Markdown viewer has no `MarkdownPanel`, so the plugin does nothing there. Upgrade QuickLook first.
 
 ## Install
 
@@ -80,23 +79,19 @@ A file from an older version that holds a full copy of the style is renamed to `
 
 ## If nothing changes
 
-The plugin writes a log: `%APPDATA%\pooi.moe\QuickLook\styledmd.log`.
+The plugin writes no log and shows no message. If it cannot patch the viewer, it does nothing, and QuickLook shows its normal Markdown preview.
+Check these in order:
 
-| You see | Meaning |
-|---|---|
-| No log file | QuickLook did not load the plugin. Check the install folder in step 2. |
-| `viewer assembly not loaded (will retry)` | The Markdown viewer was not loaded yet. Preview a `.md` file again. |
-| `GAVE UP: type or field not found ...` | Your QuickLook is too old or too new for this plugin. See [Requirements](#requirements). |
-| `GAVE UP: /md2html.html not in _resources ...` | The viewer's template changed. See [Limits](#limits). |
-| `template patched`, `forced light theme in N resources`, `css built: N bytes` | The patch worked. If the page still looks wrong, check your `user-markdown.css`. |
-
-If the plugin gives up, QuickLook shows its normal Markdown preview. Nothing else breaks.
+1. **Install folder.** `QuickLook.Plugin.StyledMD.dll` must sit directly in `%APPDATA%\pooi.moe\QuickLook\QuickLook.Plugin\QuickLook.Plugin.StyledMD\`. Restart QuickLook after you copy it.
+2. **Old copy.** Delete the folder of the earlier name `QuickLook.Plugin.MarkdownStyle` (see [Names](#names)).
+3. **QuickLook version.** See [Requirements](#requirements). A QuickLook update can also break the plugin (see [Limits](#limits)).
+4. **Your overrides.** Rename `user-markdown.css` and preview again. A wrong rule in it can hide the built-in style.
 
 ## Privacy and safety
 
 - The plugin makes no network requests.
 - It changes only QuickLook's in-memory copy of the viewer's template and style sheets. It does not edit any QuickLook file.
-- **The log records file names.** For the first 50 previews after QuickLook starts, it writes the name (not the path or the contents) of each previewed file. Delete the log whenever you like. The plugin also deletes it at startup when it is over 100 KB.
+- It writes no log and records nothing about the files you preview.
 
 ## Files the plugin writes
 
@@ -104,7 +99,6 @@ All in `%APPDATA%\pooi.moe\QuickLook\`:
 
 - `user-markdown.css`: your overrides.
 - `user-markdown.css.old`: only after migrating from an older version.
-- `styledmd.log`: the log above.
 
 ## How it works
 
@@ -120,7 +114,7 @@ All in `%APPDATA%\pooi.moe\QuickLook\`:
 ## Limits
 
 - **It relies on private names:** `MarkdownPanel._resources`, the key `/md2html.html`, and the order of links in the template.
-  A QuickLook update can change them and the plugin then gives up (see the log). Test after each QuickLook update.
+  A QuickLook update can change them and the plugin then does nothing. Test after each QuickLook update.
 - Mermaid previews use the same template, so they get the style. AsciiDoc, reStructuredText and Jupyter previews use other templates and are not styled.
 - Bebas Neue is capitals only and covers Latin characters. Other scripts fall back to your other fonts.
 - Roboto and Noto Sans are not bundled. Without them on your PC, headings and body text fall back to Segoe UI or another system font.
@@ -147,14 +141,14 @@ Push a tag that starts with `v` (for example `v0.2.0`), or run the workflow by h
 Please report problems with this plugin here, not to QuickLook. Include:
 
 - your QuickLook version,
-- the last lines of `styledmd.log` (remove file names you do not want to share),
+- what you did and what you expected, with the file you previewed if it is not private,
 - a screenshot, if the problem is how the page looks.
 
 ## Credits
 
 Thank you to:
 
-- **QuickLook** and its contributors (QL-Win), for the viewer, the plugin interface and the `QuickLook.Plugin.HelloWorld` starting point this project follows. QuickLook and `QuickLook.Common` are GPL-3.0.
+- **QuickLook** and its contributors (QL-Win), for the viewer, the plugin interface and the `QuickLook.Plugin.HelloWorld` starting point this project follows. The QuickLook source files carry GPL-3.0-or-later notices.
 - **Typesafe** (typesafe.ai), whose blog gave the look: the palette, the table and inline-code values, and the idea of a steep size and weight scale.
   This project is not affiliated with or endorsed by Typesafe. It copies no stylesheet, image or font from them.
   Their font, Die Grotesk C, is commercial and is never bundled. It is used only if you have it installed.
@@ -166,5 +160,13 @@ Thank you to:
 
 ## License
 
-No license file has been added yet. Add one before you share builds. `QuickLook.Common` is GPL-3.0, and this plugin links to it,
-so GPL-3.0 is the safe choice unless you get legal advice otherwise.
+Copyright (C) 2026 No3371.
+
+This program is free software: you can redistribute it and/or modify it under the terms of the
+GNU General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version. It is distributed without any warranty. See [LICENSE](LICENSE).
+
+GPL-3.0-or-later fits the QuickLook source files this plugin links to, which carry that notice.
+(The `QuickLook.Common` repository also contains a `LICENSE` file that says MIT. If this matters for your use, ask its authors.)
+
+Bebas Neue stays under its own license, the SIL Open Font License 1.1, in `Resources/fonts/`.

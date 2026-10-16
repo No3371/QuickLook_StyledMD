@@ -1,3 +1,19 @@
+// QuickLook.Plugin.StyledMD: restyles QuickLook's Markdown preview.
+// Copyright (C) 2026 No3371
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 using QuickLook.Common.Plugin;
 using System;
 using System.Collections.Generic;
@@ -34,9 +50,6 @@ namespace QuickLook.Plugin.StyledMD
             "pooi.moe", "QuickLook");
 
         private static string CssPath => Path.Combine(DataDir, "user-markdown.css");
-        private static string LogPath => Path.Combine(DataDir, "styledmd.log");
-
-        private static int _logLines;
 
         // Above the built-in viewer (0), so our CanHandle runs before its CanHandle returns true.
         public int Priority => 1;
@@ -44,7 +57,6 @@ namespace QuickLook.Plugin.StyledMD
         public void Init()
         {
             // Patching is lazy (first CanHandle): the target assembly must be loaded first.
-            Log("Init " + typeof(Plugin).Assembly.Location);
         }
 
         public bool CanHandle(string path)
@@ -53,16 +65,14 @@ namespace QuickLook.Plugin.StyledMD
             {
                 lock (Gate)
                 {
-                    if (_logLines < 50)
-                        Log("CanHandle " + Path.GetFileName(path) + " patched=" + _patched + " gaveUp=" + _gaveUp);
                     if (_gaveUp) return false;
                     if (!_patched) TryPatch();
                     if (_patched) ReloadCssIfChanged();
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Log("CanHandle error: " + e);
+                // never break the built-in viewer
             }
 
             return false;
@@ -87,22 +97,21 @@ namespace QuickLook.Plugin.StyledMD
                 // Plugins are loaded with Assembly.LoadFrom, so look in the AppDomain first.
                 var asm = AppDomain.CurrentDomain.GetAssemblies()
                     .FirstOrDefault(a => a.GetName().Name == ViewerAssemblyName);
-                if (asm == null) { Log("viewer assembly not loaded (will retry)"); return; }
-                Log("viewer assembly " + asm.GetName().Version + " at " + asm.Location);
+                if (asm == null) return; // not loaded (yet); retry on the next call
 
                 var panel = asm.GetType(PanelTypeName, throwOnError: false);
                 var field = panel?.GetField(ResourcesFieldName,
                     BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
-                if (field == null) { GiveUp("type or field not found: " + PanelTypeName + "." + ResourcesFieldName); return; }
+                if (field == null) { _gaveUp = true; return; }
 
                 // Fill the dictionary before we touch it.
                 RuntimeHelpers.RunClassConstructor(panel.TypeHandle);
 
                 var res = field.GetValue(null) as Dictionary<string, byte[]>;
-                if (res == null) { GiveUp("_resources is not a Dictionary<string, byte[]>"); return; }
+                if (res == null) { _gaveUp = true; return; }
                 if (!res.TryGetValue(TemplateKey, out var bytes))
                 {
-                    GiveUp(TemplateKey + " not in _resources; keys: " + string.Join(", ", res.Keys.Take(30)));
+                    _gaveUp = true;
                     return;
                 }
 
@@ -118,11 +127,10 @@ namespace QuickLook.Plugin.StyledMD
                         if (close >= 0) i = close + 1;
                     }
                     if (i < 0) i = html.IndexOf("</head>", StringComparison.OrdinalIgnoreCase);
-                    if (i < 0) { GiveUp("no insertion point in template"); return; }
+                    if (i < 0) { _gaveUp = true; return; }
 
                     html = html.Insert(i, "\n" + LinkTag);
                     res[TemplateKey] = new UTF8Encoding(false).GetBytes(html);
-                    Log("template patched at offset " + i);
                 }
 
                 ForceLightTheme(res);
@@ -131,11 +139,10 @@ namespace QuickLook.Plugin.StyledMD
                 EnsureCssFile();
                 _patched = true;
                 ReloadCssIfChanged(force: true);
-                
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                GiveUp("TryPatch error: " + e);
+                _gaveUp = true;
             }
         }
 
@@ -143,7 +150,6 @@ namespace QuickLook.Plugin.StyledMD
         // queries never match and the light ones always match, so the page stays light on a dark system.
         private static void ForceLightTheme(Dictionary<string, byte[]> res)
         {
-            var changed = 0;
             foreach (var key in res.Keys.ToList())
             {
                 if (key != TemplateKey && !key.EndsWith(".css", StringComparison.OrdinalIgnoreCase)) continue;
@@ -154,32 +160,8 @@ namespace QuickLook.Plugin.StyledMD
                 if (patched == text) continue;
 
                 res[key] = new UTF8Encoding(false).GetBytes(patched);
-                changed++;
             }
 
-            Log("forced light theme in " + changed + " resources");
-        }
-
-        private static void GiveUp(string reason)
-        {
-            _gaveUp = true;
-            Log("GAVE UP: " + reason);
-        }
-
-        private static void Log(string message)
-        {
-            try
-            {
-                Directory.CreateDirectory(DataDir);
-                if (_logLines == 0 && File.Exists(LogPath) && new FileInfo(LogPath).Length > 100 * 1024)
-                    File.Delete(LogPath);
-                _logLines++;
-                File.AppendAllText(LogPath, DateTime.Now.ToString("s") + " " + message + Environment.NewLine);
-            }
-            catch
-            {
-                // logging must never break the viewer
-            }
         }
 
         private const string LegacyMarker = "/* QuickLook Markdown style (user file).";
@@ -206,7 +188,6 @@ namespace QuickLook.Plugin.StyledMD
                     var old = path + ".old";
                     if (File.Exists(old)) File.Delete(old);
                     File.Move(path, old);
-                    Log("moved old full copy to " + old);
                 }
             }
 
@@ -256,7 +237,6 @@ namespace QuickLook.Plugin.StyledMD
 
             _resources[CssKey] = css.ToArray();
             _cssStamp = stamp;
-            Log("css built: " + css.Count + " bytes");
         }
     }
 }
