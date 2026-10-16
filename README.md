@@ -12,8 +12,7 @@ The opinionated style is inspired by amazing design of the website of Typesafe.a
 |---|---|
 | OS | Windows |
 | QuickLook | A version whose Markdown viewer has `MarkdownPanel._resources` (Built with QuickLook 4.5.0) |
-| Bebas Nenu (Font) | For intended h1/h2 styling |
-| Roboto or Noto Sans (Font) | For intended general font styling |
+| Roboto or Noto Sans (Font) | For intended general font styling. Bebas Neue for h1/h2 is built into the plugin |
 
 ## Install
 
