@@ -1,0 +1,7 @@
+<Project>
+  <!-- QuickLook.Common runs "$(SolutionDir)Scripts\update-version.ps1" before its build.
+       Without a .sln (plain "dotnet build x.csproj") SolutionDir is empty, so point it at this folder. -->
+  <PropertyGroup>
+    <SolutionDir Condition="'$(SolutionDir)' == '' Or '$(SolutionDir)' == '*Undefined*'">$(MSBuildThisFileDirectory)</SolutionDir>
+  </PropertyGroup>
+</Project>
