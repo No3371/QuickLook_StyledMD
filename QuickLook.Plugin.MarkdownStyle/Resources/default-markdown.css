@@ -3,10 +3,14 @@
    Location: %APPDATA%\pooi.moe\QuickLook\user-markdown.css
    Delete this file to get the default again.
 
-   Look: typesafe.ai blog. Colors, fonts, inline code and table values are copied from that page.
-   Sizes, spacing, line height and dark mode are my own: the site has no dark mode and uses
-   64px headings with 1.12 line height, which is too tight and too large for a preview pane.
-   "Die Grotesk C" is a commercial font. It is used only if installed; otherwise Inter / system. */
+   Look: typesafe.ai blog. The idea taken from it is a steep size/weight scale:
+   small, calm body text against very large headings, with light and medium weights side by side.
+   Palette, inline code and table values are copied from that page.
+   Scale, weights, spacing and dark mode are my own: the site has no dark mode and uses 64px
+   headings with 1.12 body line height, which is too tight and too large for a preview pane.
+
+   Fonts: Roboto first. A font list falls back per character, so characters Roboto lacks
+   (CJK, symbols) use the next installed font. "Die Grotesk C" is commercial and used only if installed. */
 
 :root {
   --ts-bg: #abbab9;
@@ -16,8 +20,8 @@
   --ts-rule: #99999940;
   --ts-th-bg: #9999991a;
   --ts-accent: #d45bb6;
-  --ts-sans: "Die Grotesk C Regular", "Inter", "Segoe UI", system-ui, sans-serif;
-  --ts-sans-bold: "Die Grotesk C Medium", "Inter", "Segoe UI", system-ui, sans-serif;
+  --ts-sans: Roboto, "Die Grotesk C Regular", Inter, "Segoe UI", system-ui,
+             "Noto Sans TC", "Microsoft JhengHei", "Noto Sans CJK TC", sans-serif;
   --ts-mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
 }
 
@@ -25,7 +29,7 @@
   :root {
     --ts-bg: #1e1e1e;
     --ts-text: #dedede;
-    --ts-text-soft: #c4c4c4;
+    --ts-text-soft: #b8b8b8;
     --ts-code-bg: #ffffff1f;
     --ts-rule: #ffffff29;
     --ts-th-bg: #ffffff0f;
@@ -41,15 +45,16 @@ body.markdown-body {
 body.markdown-body {
   font-family: var(--ts-sans);
   font-size: 17px;
+  font-weight: 400;
   line-height: 1.6;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
 #preview {
   box-sizing: border-box;
-  max-width: 760px;
+  max-width: 780px;
   margin: 0 auto;
-  padding: 32px 40px 64px;
+  padding: 40px 40px 80px;
   color: var(--ts-text);
 }
 
@@ -71,7 +76,7 @@ body.markdown-body {
   margin-top: 0.3em;
 }
 
-/* Headings: h1/h2 regular weight and wide tracking, h3+ medium weight (as on the site). */
+/* ---- Scale: 17px body, then 27 / 42 / 62px. Weight alternates: 500, 300, 500. ---- */
 #preview h1,
 #preview h2,
 #preview h3,
@@ -80,33 +85,76 @@ body.markdown-body {
 #preview h6 {
   color: var(--ts-text);
   border: 0;
-  line-height: 1.2;
-  margin-top: 1.9em;
-  margin-bottom: 0.6em;
+  padding: 0;
+  font-family: var(--ts-sans);
 }
 
-#preview h1 { font: 500 2.6em/1.1 var(--ts-sans-bold); letter-spacing: 0; }
-#preview h2 { font: 400 2em/1.15 var(--ts-sans); letter-spacing: 0.04em; }
-#preview h3 { font: 500 1.5em/1.2 var(--ts-sans-bold); letter-spacing: 0.01em; }
+#preview h1 {
+  font-size: 3.65em;
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.45em;
+}
+
+#preview h2 {
+  font-size: 2.5em;
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  margin: 2em 0 0.55em;
+}
+
+#preview h3 {
+  font-size: 1.6em;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+  margin: 1.8em 0 0.5em;
+}
+
 #preview h4,
 #preview h5,
-#preview h6 { font: 500 1.15em/1.3 var(--ts-sans-bold); letter-spacing: 0.01em; }
+#preview h6 {
+  font-size: 0.78em;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ts-text-soft);
+  margin: 2em 0 0.6em;
+}
+
+/* Lead paragraph right after the title: bigger and lighter than body text. */
+#preview > h1 + p {
+  font-size: 1.4em;
+  font-weight: 300;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: var(--ts-text-soft);
+  margin-bottom: 1.4em;
+}
 
 #preview strong,
 #preview b {
-  font-family: var(--ts-sans-bold);
-  font-weight: 500;
+  font-weight: 700;
 }
 
 #preview a {
   color: inherit;
   text-decoration: underline;
   text-decoration-color: var(--ts-accent);
+  text-decoration-thickness: 1.5px;
   text-underline-offset: 0.18em;
 }
 
 #preview a:hover {
   color: var(--ts-accent);
+}
+
+/* Headings that carry an anchor link must not show the underline. */
+#preview h1 a, #preview h2 a, #preview h3 a, #preview h4 a, #preview h5 a, #preview h6 a {
+  text-decoration: none;
 }
 
 /* Inline code: JetBrains Mono 300 at 0.8 scale, #1e1e1e1f background, 3px radius. */
@@ -134,10 +182,14 @@ body.markdown-body {
   font-size: 0.85em;
 }
 
+/* Quote: larger and lighter than body text, with an accent bar. */
 #preview blockquote {
-  color: var(--ts-text-soft);
+  font-size: 1.25em;
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ts-text);
   border-left: 3px solid var(--ts-accent);
-  padding: 0 1em;
+  padding: 0 0 0 1em;
 }
 
 /* Table: 1px #99999940 border, 8px radius, 10px cell padding, tinted header. */
@@ -149,6 +201,13 @@ body.markdown-body {
   border: 1px solid var(--ts-rule);
   border-radius: 8px;
   overflow: hidden;
+  font-size: 0.94em;
+}
+
+#preview table tr,
+#preview table tr:nth-child(2n) {
+  background: none;
+  border: 0;
 }
 
 #preview table th,
@@ -162,6 +221,10 @@ body.markdown-body {
 #preview table th {
   background: var(--ts-th-bg);
   text-align: left;
+  font-size: 0.8em;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 #preview table tr + tr td,
@@ -181,5 +244,11 @@ body.markdown-body {
   border-top: 1px solid var(--ts-rule);
   background: none;
   height: 0;
-  margin: 2em 0;
+  margin: 2.5em 0;
+}
+
+/* Table of contents sidebar: same background as the page, thin divider. */
+body.markdown-body #toc.toc {
+  background: transparent;
+  border-right: 1px solid var(--ts-rule);
 }
