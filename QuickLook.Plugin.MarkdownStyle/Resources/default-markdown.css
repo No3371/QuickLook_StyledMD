@@ -76,7 +76,8 @@ body.markdown-body {
   margin-top: 0.3em;
 }
 
-/* ---- Scale: 17px body, then 27 / 42 / 62px. Weight alternates: 500, 300, 500. ---- */
+/* ---- Scale: 17px body (weight 400), then 34 / 49 / 92px. Weights: h3 700, h2 300, h1 800. ----
+   800 maps to the next heavier installed weight (900), else 700. */
 #preview h1,
 #preview h2,
 #preview h3,
@@ -90,15 +91,15 @@ body.markdown-body {
 }
 
 #preview h1 {
-  font-size: 3.65em;
-  font-weight: 500;
-  line-height: 0.98;
-  letter-spacing: -0.03em;
-  margin: 0 0 0.45em;
+  font-size: clamp(2.8em, 9vw, 5.4em);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  margin: 0 0 0.4em;
 }
 
 #preview h2 {
-  font-size: 2.5em;
+  font-size: 2.9em;
   font-weight: 300;
   line-height: 1.05;
   letter-spacing: -0.015em;
@@ -106,10 +107,10 @@ body.markdown-body {
 }
 
 #preview h3 {
-  font-size: 1.6em;
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.005em;
+  font-size: 2em;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   margin: 1.8em 0 0.5em;
 }
 
