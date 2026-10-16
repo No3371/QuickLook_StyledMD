@@ -16,8 +16,16 @@ file when its timestamp changes. Any failure is caught and leaves the built-in v
 If the CSS file is missing, the plugin writes `Resources/default-markdown.css` there.
 
 ## Build
-Target: `net462`. Check out `QuickLook.Common` beside this folder (as `QuickLook.Plugin.HelloWorld` does).
-Put `QuickLook.Plugin.MarkdownStyle.dll` in a `QuickLook.Plugin.MarkdownStyle` folder under `QuickLook.Plugin`.
+Same layout as `QuickLook.Plugin.HelloWorld`. Needs Windows with the .NET SDK or Visual Studio 2022.
+
+```powershell
+git submodule update --init            # fetches QuickLook.Common
+dotnet build -c Release                # output: bin\Release\
+powershell Scripts\pack-zip.ps1        # output: QuickLook.Plugin.MarkdownStyle.qlplugin
+```
+
+A `.qlplugin` file is a zip of `bin\Release\` (without `*.pdb` and `*.xml`) with the extension renamed.
+Install (not verified): open the `.qlplugin` file with QuickLook, or unzip it into a `QuickLook.Plugin\QuickLook.Plugin.MarkdownStyle` folder.
 
 ## Not tested
 Written on Linux with no .NET toolchain: it was never compiled or run. Test on Windows against your QuickLook version.
