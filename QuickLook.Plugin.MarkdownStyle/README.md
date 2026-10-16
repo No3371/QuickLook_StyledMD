@@ -30,3 +30,7 @@ Install (not verified): open the `.qlplugin` file with QuickLook, or unzip it in
 ## Not tested
 Written on Linux with no .NET toolchain: it was never compiled or run. Test on Windows against your QuickLook version.
 It relies on private names: `MarkdownPanel._resources`, the key `/md2html.html`, and a literal `</head>`.
+
+## Debugging
+The plugin writes `%APPDATA%\pooi.moe\QuickLook\markdownstyle.log`. If the file does not exist after you preview
+a file, QuickLook did not load the plugin. If it ends with `GAVE UP: ...`, the line says which assumption failed.
