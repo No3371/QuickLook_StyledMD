@@ -34,3 +34,8 @@ It relies on private names: `MarkdownPanel._resources`, the key `/md2html.html`,
 ## Debugging
 The plugin writes `%APPDATA%\pooi.moe\QuickLook\markdownstyle.log`. If the file does not exist after you preview
 a file, QuickLook did not load the plugin. If it ends with `GAVE UP: ...`, the line says which assumption failed.
+
+## Requirements
+Needs a QuickLook whose Markdown viewer has `MarkdownPanel._resources`. Checked in source: QuickLook 4.5.0 and master.
+QuickLook 3.6.4 does not have it (it loads the template from a .NET resource and calls `WebpagePanel.LoadHtml`),
+so the log shows `GAVE UP: type or field not found`.
