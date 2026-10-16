@@ -1,14 +1,12 @@
 /* QuickLook Markdown style: built-in default (embedded in the plugin DLL, replaced on every update).
    To change something, put overrides in %APPDATA%\pooi.moe\QuickLook\user-markdown.css. It loads after this.
 
-   Look: typesafe.ai blog. The idea taken from it is a steep size/weight scale:
-   small, calm body text against very large headings, with light and medium weights side by side.
-   Palette, inline code and table values are copied from that page.
-   Scale, weights, spacing and dark mode are my own: the site has no dark mode and uses 64px
-   headings with 1.12 body line height, which is too tight and too large for a preview pane.
+   Look: typesafe.ai blog. Light only: soft sage page, soft black text, steep size/weight scale.
+   Palette, inline code and table values are copied from that page. Scale, weights and spacing are my own.
+   The plugin also forces GitHub's light theme, so a dark system theme does not change this page.
 
-   Fonts: Roboto first, then Noto Sans. A font list falls back per character, so characters Roboto lacks
-   (CJK, symbols) use the next installed font. "Die Grotesk C" is commercial and used only if installed. */
+   Fonts: h1/h2 use Bebas Neue (embedded in the plugin, ALL CAPS, Latin only). Body uses Roboto, then Noto Sans.
+   A font list falls back per character, so characters a font lacks (CJK, symbols) use the next installed font. */
 
 :root {
   --ts-bg: #abbab9;
@@ -21,17 +19,8 @@
   --ts-sans: Roboto, "Noto Sans", "Die Grotesk C Regular", Inter, "Segoe UI", system-ui,
              "Noto Sans TC", "Microsoft JhengHei", "Noto Sans CJK TC", sans-serif;
   --ts-mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ts-bg: #1e1e1e;
-    --ts-text: #dedede;
-    --ts-text-soft: #b8b8b8;
-    --ts-code-bg: #ffffff1f;
-    --ts-rule: #ffffff29;
-    --ts-th-bg: #ffffff0f;
-  }
+  --ts-display: "Bebas Neue", Roboto, "Noto Sans", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  color-scheme: light;
 }
 
 html,
@@ -77,8 +66,7 @@ body.markdown-body {
   margin-top: 0.3em;
 }
 
-/* ---- Scale: 17px body (weight 400), then 34 / 49 / 92px. Weights: h3 700, h2 300, h1 800. ----
-   800 maps to the next heavier installed weight (900), else 700. */
+/* ---- Scale: 17px body (weight 400), h3 29px / h2 48px / h1 up to 75px. h1 and h2 are Bebas Neue (one weight). ---- */
 #preview h1,
 #preview h2,
 #preview h3,
@@ -91,26 +79,30 @@ body.markdown-body {
   font-family: var(--ts-sans);
 }
 
+#preview h1,
+#preview h2 {
+  font-family: var(--ts-display);
+  font-weight: 400;
+}
+
 #preview h1 {
-  font-size: clamp(2.8em, 9vw, 5.4em);
-  font-weight: 800;
-  -webkit-text-stroke: 1px currentColor;
-  line-height: 0.92;
-  letter-spacing: -0.035em;
+  font-size: clamp(2.6em, 7.5vw, 4.4em);
+  -webkit-text-stroke: 0.5px currentColor;
+  line-height: 0.9;
+  letter-spacing: 0.01em;
   margin: 0 0 0.4em;
 }
 
 #preview h2 {
-  font-size: 2.9em;
-  font-weight: 300;
-  -webkit-text-stroke: 0;
-  line-height: 1.05;
-  letter-spacing: -0.015em;
-  margin: 2em 0 0.55em;
+  font-size: 2.8em;
+  -webkit-text-stroke: 0.3px currentColor;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  margin: 1.9em 0 0.5em;
 }
 
 #preview h3 {
-  font-size: 2em;
+  font-size: 1.7em;
   font-weight: 700;
   -webkit-text-stroke: 0.7px currentColor;
   line-height: 1.1;
@@ -164,18 +156,18 @@ body.markdown-body {
   text-decoration: none;
 }
 
-/* Inline code: JetBrains Mono 300 at 0.8 scale, #1e1e1e1f background, 3px radius. */
+/* Inline code: JetBrains Mono at 0.8 scale, #1e1e1e1f background, 3px radius. Weight 400 plus a thin stroke. */
 #preview code,
 #preview tt {
   font-family: var(--ts-mono);
-  font-weight: 300;
+  font-weight: 400;
   font-size: 0.8em;
   letter-spacing: 0;
-  color: var(--ts-text-soft);
+  color: var(--ts-text);
   background: var(--ts-code-bg);
   border-radius: 3px;
   padding: 0 0.4em;
-  -webkit-text-stroke: 0;
+  -webkit-text-stroke: 0.3px currentColor;
 }
 
 #preview pre {

@@ -40,3 +40,7 @@ a file, QuickLook did not load the plugin. If it ends with `GAVE UP: ...`, the l
 Needs a QuickLook whose Markdown viewer has `MarkdownPanel._resources`. Checked in source: QuickLook 4.5.0 and master.
 QuickLook 3.6.4 does not have it (it loads the template from a .NET resource and calls `WebpagePanel.LoadHtml`),
 so the log shows `GAVE UP: type or field not found`.
+
+## Fonts and theme
+- h1 and h2 use Bebas Neue, embedded in the DLL as a Latin-subset WOFF2 (SIL OFL 1.1, license in `Resources/fonts/`). An installed Bebas Neue is used first.
+- The page is light only. The plugin rewrites `prefers-color-scheme` queries in the viewer's CSS and template in memory, so a dark system theme has no effect.

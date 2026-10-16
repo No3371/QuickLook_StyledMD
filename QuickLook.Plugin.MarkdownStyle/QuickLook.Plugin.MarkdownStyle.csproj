@@ -37,6 +37,10 @@
         <EmbeddedResource Include="Resources\default-markdown.css">
             <LogicalName>default-markdown.css</LogicalName>
         </EmbeddedResource>
+        <EmbeddedResource Include="Resources\fonts\bebas-neue-latin-400.woff2">
+            <LogicalName>bebas-neue-latin-400.woff2</LogicalName>
+        </EmbeddedResource>
+        <None Include="Resources\fonts\BebasNeue-OFL-LICENSE.txt" />
         <None Include="QuickLook.Plugin.Metadata.config">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>

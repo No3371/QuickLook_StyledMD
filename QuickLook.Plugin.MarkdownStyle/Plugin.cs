@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace QuickLook.Plugin.MarkdownStyle
 {
@@ -124,6 +125,8 @@ namespace QuickLook.Plugin.MarkdownStyle
                     Log("template patched at offset " + i);
                 }
 
+                ForceLightTheme(res);
+
                 _resources = res;
                 EnsureCssFile();
                 _patched = true;
@@ -134,6 +137,27 @@ namespace QuickLook.Plugin.MarkdownStyle
             {
                 GiveUp("TryPatch error: " + e);
             }
+        }
+
+        // GitHub's CSS and the template pick a dark theme through "prefers-color-scheme". Make the dark
+        // queries never match and the light ones always match, so the page stays light on a dark system.
+        private static void ForceLightTheme(Dictionary<string, byte[]> res)
+        {
+            var changed = 0;
+            foreach (var key in res.Keys.ToList())
+            {
+                if (key != TemplateKey && !key.EndsWith(".css", StringComparison.OrdinalIgnoreCase)) continue;
+
+                var text = Encoding.UTF8.GetString(res[key]);
+                var patched = Regex.Replace(text, @"prefers-color-scheme:\s*dark", "min-width: 99999px");
+                patched = Regex.Replace(patched, @"prefers-color-scheme:\s*light", "min-width: 0px");
+                if (patched == text) continue;
+
+                res[key] = new UTF8Encoding(false).GetBytes(patched);
+                changed++;
+            }
+
+            Log("forced light theme in " + changed + " resources");
         }
 
         private static void GiveUp(string reason)
@@ -190,6 +214,23 @@ namespace QuickLook.Plugin.MarkdownStyle
                 File.WriteAllText(path, UserTemplate, new UTF8Encoding(false));
         }
 
+        // Bebas Neue (SIL OFL 1.1), Latin subset. A font installed on the PC is used first.
+        private static string BuildFontFaceCss()
+        {
+            using (var s = typeof(Plugin).Assembly.GetManifestResourceStream("bebas-neue-latin-400.woff2"))
+            {
+                if (s == null) return "";
+                using (var ms = new MemoryStream())
+                {
+                    s.CopyTo(ms);
+                    return "@font-face{font-family:\"Bebas Neue\";font-style:normal;font-weight:400;" +
+                           "src:local(\"Bebas Neue\"),url(data:font/woff2;base64," + Convert.ToBase64String(ms.ToArray()) + ") format(\"woff2\");" +
+                           "unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329," +
+                           "U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}\n";
+                }
+            }
+        }
+
         private static byte[] ReadDefaultCss()
         {
             using (var s = typeof(Plugin).Assembly.GetManifestResourceStream("default-markdown.css"))
@@ -206,8 +247,9 @@ namespace QuickLook.Plugin.MarkdownStyle
             var stamp = File.Exists(path) ? File.GetLastWriteTimeUtc(path) : DateTime.MinValue;
             if (!force && stamp == _cssStamp) return;
 
-            // Built-in default first, then the user's file, so the user's rules win.
-            var css = new List<byte>(ReadDefaultCss());
+            // Embedded font, then the built-in default, then the user's file, so the user's rules win.
+            var css = new List<byte>(Encoding.UTF8.GetBytes(BuildFontFaceCss()));
+            css.AddRange(ReadDefaultCss());
             css.AddRange(Encoding.UTF8.GetBytes("\n"));
             if (File.Exists(path))
                 css.AddRange(File.ReadAllBytes(path));
