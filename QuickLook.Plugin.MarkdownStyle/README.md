@@ -8,12 +8,13 @@ assembly and runs the static constructor of `MarkdownPanel`. It reflects the sta
 `_resources` dictionary and does two things:
 
 1. Inserts `<link rel="stylesheet" href="user.css" />` before `</head>` in `/md2html.html`.
-2. Stores `%APPDATA%\pooi.moe\QuickLook\user-markdown.css` under `/user.css`.
+2. Stores the built-in default style (embedded in the DLL), followed by `%APPDATA%\pooi.moe\QuickLook\user-markdown.css`, under `/user.css`.
 
 The built-in viewer already serves any key in `_resources`. The plugin re-reads the CSS
 file when its timestamp changes. Any failure is caught and leaves the built-in viewer unchanged.
 
-If the CSS file is missing, the plugin writes `Resources/default-markdown.css` there.
+The default style updates with the plugin. `user-markdown.css` holds only your overrides and loads last.
+If the file is missing, the plugin writes an empty template. A file from an older version that holds a full copy of the default is renamed to `user-markdown.css.old`.
 
 ## Build
 Same layout as `QuickLook.Plugin.HelloWorld`. Needs Windows with the .NET SDK or Visual Studio 2022.

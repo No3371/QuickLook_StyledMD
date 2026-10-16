@@ -128,7 +128,7 @@ namespace QuickLook.Plugin.MarkdownStyle
                 EnsureCssFile();
                 _patched = true;
                 ReloadCssIfChanged(force: true);
-                Log("css loaded: " + res[CssKey].Length + " bytes");
+                
             }
             catch (Exception e)
             {
@@ -158,29 +158,63 @@ namespace QuickLook.Plugin.MarkdownStyle
             }
         }
 
+        private const string LegacyMarker = "/* QuickLook Markdown style (user file).";
+        private const string UserTemplate =
+            "/* QuickLook Markdown style: your overrides.\r\n" +
+            "   The built-in default style loads first, then this file. Put only what you want to change here.\r\n" +
+            "   Changes load on the next preview. Example:\r\n" +
+            "     #preview { max-width: 900px; }\r\n" +
+            "*/\r\n";
+
         private static void EnsureCssFile()
         {
             var path = CssPath;
-            if (File.Exists(path)) return;
-
             Directory.CreateDirectory(Path.GetDirectoryName(path));
-            using (var s = typeof(Plugin).Assembly.GetManifestResourceStream("default-markdown.css"))
-            using (var f = File.Create(path))
+
+            // Older versions copied the whole default into this file, which then never got updates.
+            if (File.Exists(path))
             {
-                s?.CopyTo(f);
+                string head;
+                using (var r = new StreamReader(path, Encoding.UTF8))
+                    head = r.ReadLine() ?? "";
+                if (head.StartsWith(LegacyMarker, StringComparison.Ordinal))
+                {
+                    var old = path + ".old";
+                    if (File.Exists(old)) File.Delete(old);
+                    File.Move(path, old);
+                    Log("moved old full copy to " + old);
+                }
+            }
+
+            if (!File.Exists(path))
+                File.WriteAllText(path, UserTemplate, new UTF8Encoding(false));
+        }
+
+        private static byte[] ReadDefaultCss()
+        {
+            using (var s = typeof(Plugin).Assembly.GetManifestResourceStream("default-markdown.css"))
+            using (var ms = new MemoryStream())
+            {
+                s?.CopyTo(ms);
+                return ms.ToArray();
             }
         }
 
         private static void ReloadCssIfChanged(bool force = false)
         {
             var path = CssPath;
-            if (!File.Exists(path)) return;
-
-            var stamp = File.GetLastWriteTimeUtc(path);
+            var stamp = File.Exists(path) ? File.GetLastWriteTimeUtc(path) : DateTime.MinValue;
             if (!force && stamp == _cssStamp) return;
 
-            _resources[CssKey] = File.ReadAllBytes(path);
+            // Built-in default first, then the user's file, so the user's rules win.
+            var css = new List<byte>(ReadDefaultCss());
+            css.AddRange(Encoding.UTF8.GetBytes("\n"));
+            if (File.Exists(path))
+                css.AddRange(File.ReadAllBytes(path));
+
+            _resources[CssKey] = css.ToArray();
             _cssStamp = stamp;
+            Log("css built: " + css.Count + " bytes");
         }
     }
 }

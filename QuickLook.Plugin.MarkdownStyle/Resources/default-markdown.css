@@ -1,7 +1,5 @@
-/* QuickLook Markdown style (user file).
-   Edit freely; changes load on the next preview.
-   Location: %APPDATA%\pooi.moe\QuickLook\user-markdown.css
-   Delete this file to get the default again.
+/* QuickLook Markdown style: built-in default (embedded in the plugin DLL, replaced on every update).
+   To change something, put overrides in %APPDATA%\pooi.moe\QuickLook\user-markdown.css. It loads after this.
 
    Look: typesafe.ai blog. The idea taken from it is a steep size/weight scale:
    small, calm body text against very large headings, with light and medium weights side by side.
@@ -9,7 +7,7 @@
    Scale, weights, spacing and dark mode are my own: the site has no dark mode and uses 64px
    headings with 1.12 body line height, which is too tight and too large for a preview pane.
 
-   Fonts: Roboto first. A font list falls back per character, so characters Roboto lacks
+   Fonts: Roboto first, then Noto Sans. A font list falls back per character, so characters Roboto lacks
    (CJK, symbols) use the next installed font. "Die Grotesk C" is commercial and used only if installed. */
 
 :root {
@@ -20,7 +18,7 @@
   --ts-rule: #99999940;
   --ts-th-bg: #9999991a;
   --ts-accent: #d45bb6;
-  --ts-sans: Roboto, "Die Grotesk C Regular", Inter, "Segoe UI", system-ui,
+  --ts-sans: Roboto, "Noto Sans", "Die Grotesk C Regular", Inter, "Segoe UI", system-ui,
              "Noto Sans TC", "Microsoft JhengHei", "Noto Sans CJK TC", sans-serif;
   --ts-mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
 }
